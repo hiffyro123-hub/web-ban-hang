@@ -1,51 +1,54 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 
 function Header() {
-  const { cartItems } = useContext(CartContext);
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const { cartItems, isLoggedIn, logout } = useContext(CartContext);
+  const navigate = useNavigate();
 
-  // Kiểm tra xem đã đăng nhập chưa từ bộ nhớ trình duyệt
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const user = JSON.parse(localStorage.getItem('user'));
-
-  // Hàm xử lý Đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn'); // Xóa trạng thái đăng nhập
-    window.location.href = '/'; // Tải lại trang về trang chủ
+    logout(); // Đăng xuất mượt
+    navigate('/'); // Lướt về trang chủ mượt
   };
 
   return (
-    <header style={{ 
-      backgroundColor: '#008848', padding: '15px 30px', display: 'flex', 
-      justifyContent: 'space-between', alignItems: 'center', color: 'white' 
-    }}>
-      <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '24px', fontWeight: 'bold' }}>
+    <header style={{ backgroundColor: '#008848', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      
+      {/* 1. Logo bên trái */}
+      <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '24px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
         🛒 BÁCH HÓA ONLINE
       </Link>
-      
-      <input 
-        type="text" placeholder="Giao nhanh 2H & đúng khung giờ..." 
-        style={{ padding: '10px', width: '40%', borderRadius: '4px', border: 'none', outline: 'none' }}
-      />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        {/* Nút Giỏ Hàng */}
-        <Link to="/cart" style={{ backgroundColor: '#ffb700', color: '#333', textDecoration: 'none', padding: '10px 15px', borderRadius: '4px', fontWeight: 'bold' }}>
-          Giỏ hàng ({totalItems})
+      {/* 2. Thanh tìm kiếm ở giữa (Đã được khôi phục) */}
+      <div style={{ flex: 1, margin: '0 40px', maxWidth: '600px' }}>
+        <input 
+          type="text" 
+          placeholder="Giao nhanh 2H & đúng khung giờ..." 
+          style={{ 
+            width: '100%', 
+            padding: '10px 15px', 
+            borderRadius: '4px', 
+            border: 'none', 
+            backgroundColor: '#444', 
+            color: 'white',
+            fontSize: '14px',
+            outline: 'none'
+          }} 
+        />
+      </div>
+
+      {/* 3. Cụm nút bên phải */}
+      <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+        <Link to="/cart" style={{ backgroundColor: '#ffc107', color: 'black', padding: '10px 15px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold', marginRight: '15px' }}>
+          Giỏ hàng ({cartItems.length})
         </Link>
 
-        {/* Khu vực Đăng nhập / Đăng xuất */}
         {isLoggedIn ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>Chào, <strong>{user?.name}</strong></span>
-            <button onClick={handleLogout} style={{ padding: '5px 10px', cursor: 'pointer', border: 'none', borderRadius: '4px' }}>
-              Đăng xuất
-            </button>
-          </div>
+          <button onClick={handleLogout} style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', padding: '10px 15px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+            Đăng xuất
+          </button>
         ) : (
-          <Link to="/auth" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', border: '1px solid white', padding: '8px 15px', borderRadius: '4px' }}>
+          <Link to="/auth" style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', padding: '10px 15px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' }}>
             Đăng nhập
           </Link>
         )}
