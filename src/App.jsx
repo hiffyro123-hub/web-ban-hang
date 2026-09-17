@@ -23,7 +23,7 @@ function App() {
         </Routes>
         
         {/* NEW: Khung hiển thị thông báo, đặt ở góc phải trên, tự tắt sau 2 giây */}
-        <ToastContainer position="top-right" autoClose={2000} />
+        <ToastContainer position="top-center" autoClose={2000} />
         
       </BrowserRouter>
     </CartProvider>
