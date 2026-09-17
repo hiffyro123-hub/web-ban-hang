@@ -1,11 +1,37 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { toast } from 'react-toastify'; 
 
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
+  // 1. QUẢN LÝ TRẠNG THÁI ĐĂNG NHẬP
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
 
-  // Hàm 1: Thêm vào giỏ
+  const login = () => {
+    localStorage.setItem('isLoggedIn', 'true');
+    setIsLoggedIn(true);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('isLoggedIn');
+    setIsLoggedIn(false);
+  };
+
+  // 2. QUẢN LÝ GIỎ HÀNG
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCart = localStorage.getItem('cartItems');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // Chỉ hiển thị giỏ hàng khi đã đăng nhập
+  const displayCartItems = isLoggedIn ? cartItems : [];
+
   const addToCart = (product) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -16,20 +42,17 @@ export function CartProvider({ children }) {
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
-    alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+    toast.success(`Đã thêm ${product.name} vào giỏ hàng!`);
   };
 
-  // Hàm 2: Xóa khỏi giỏ
   const removeFromCart = (id) => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-  // Hàm 3: Tăng/giảm số lượng
   const updateQuantity = (id, amount) => {
     setCartItems(cartItems.map(item => {
       if (item.id === id) {
         const newQuantity = item.quantity + amount;
-        // Đảm bảo số lượng không bị âm (nhỏ nhất là 1)
         return { ...item, quantity: newQuantity > 0 ? newQuantity : 1 };
       }
       return item;
@@ -37,7 +60,13 @@ export function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider value={{ 
+      isLoggedIn, login, logout, // Phải có 3 cái này để Auth.jsx và Header.jsx hoạt động
+      cartItems: displayCartItems, 
+      addToCart, 
+      removeFromCart, 
+      updateQuantity 
+    }}>
       {children}
     </CartContext.Provider>
   );

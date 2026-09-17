@@ -7,9 +7,14 @@ function Header() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Đăng xuất mượt
-    navigate('/'); // Lướt về trang chủ mượt
+    logout(); 
+    navigate('/'); 
   };
+
+  const userName = localStorage.getItem('userName') || 'bạn';
+
+  // TÍNH TỔNG SỐ LƯỢNG SẢN PHẨM: Cộng dồn thuộc tính "quantity" của tất cả các món
+  const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <header style={{ backgroundColor: '#008848', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -19,7 +24,7 @@ function Header() {
         🛒 BÁCH HÓA ONLINE
       </Link>
 
-      {/* 2. Thanh tìm kiếm ở giữa (Đã được khôi phục) */}
+      {/* 2. Thanh tìm kiếm ở giữa */}
       <div style={{ flex: 1, margin: '0 40px', maxWidth: '600px' }}>
         <input 
           type="text" 
@@ -39,14 +44,21 @@ function Header() {
 
       {/* 3. Cụm nút bên phải */}
       <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+        
+        {/* ĐÃ SỬA: Hiển thị totalQuantity thay vì cartItems.length */}
         <Link to="/cart" style={{ backgroundColor: '#ffc107', color: 'black', padding: '10px 15px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold', marginRight: '15px' }}>
-          Giỏ hàng ({cartItems.length})
+          Giỏ hàng ({totalQuantity})
         </Link>
 
         {isLoggedIn ? (
-          <button onClick={handleLogout} style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', padding: '10px 15px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-            Đăng xuất
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <span style={{ color: 'white', fontSize: '16px' }}>
+              Chào, <strong>{userName}</strong>
+            </span>
+            <button onClick={handleLogout} style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+              Đăng xuất
+            </button>
+          </div>
         ) : (
           <Link to="/auth" style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', padding: '10px 15px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' }}>
             Đăng nhập
