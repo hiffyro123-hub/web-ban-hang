@@ -1,36 +1,11 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { toast } from 'react-toastify'; 
+import React, { createContext, useState } from 'react';
 
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  // 1. Quản lý trạng thái Đăng nhập mượt mà
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('isLoggedIn') === 'true';
-  });
+  const [cartItems, setCartItems] = useState([]);
 
-  const login = () => {
-    localStorage.setItem('isLoggedIn', 'true');
-    setIsLoggedIn(true);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('isLoggedIn');
-    setIsLoggedIn(false);
-  };
-
-  // 2. Quản lý Giỏ hàng
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem('cartItems');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const displayCartItems = isLoggedIn ? cartItems : [];
-
+  // Hàm 1: Thêm vào giỏ
   const addToCart = (product) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -41,17 +16,20 @@ export function CartProvider({ children }) {
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
-    toast.success(`Đã thêm ${product.name} vào giỏ hàng!`);
+    alert(`Đã thêm ${product.name} vào giỏ hàng!`);
   };
 
+  // Hàm 2: Xóa khỏi giỏ
   const removeFromCart = (id) => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
+  // Hàm 3: Tăng/giảm số lượng
   const updateQuantity = (id, amount) => {
     setCartItems(cartItems.map(item => {
       if (item.id === id) {
         const newQuantity = item.quantity + amount;
+        // Đảm bảo số lượng không bị âm (nhỏ nhất là 1)
         return { ...item, quantity: newQuantity > 0 ? newQuantity : 1 };
       }
       return item;
@@ -59,11 +37,7 @@ export function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ 
-      isLoggedIn, login, logout, // Xuất công cụ đăng nhập ra
-      cartItems: displayCartItems, 
-      addToCart, removeFromCart, updateQuantity 
-    }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   );

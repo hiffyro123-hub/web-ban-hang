@@ -1,21 +1,20 @@
 import React, { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // Thêm dòng này
 
 function ProductCard({ product }) {
   const { addToCart } = useContext(CartContext);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Khởi tạo công cụ chuyển trang
 
+  // Hàm kiểm tra trước khi thêm vào giỏ
   const handleAddToCart = () => {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     
     if (!isLoggedIn) {
-      // Thay alert() cũ bằng dòng này (thông báo màu vàng cảnh báo)
-      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!'); 
-      navigate('/auth');
+      alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+      navigate('/auth'); // Đẩy người dùng sang trang Đăng nhập
     } else {
-      addToCart(product);
+      addToCart(product); // Nếu đã đăng nhập thì cho phép thêm
     }
   };
 
@@ -27,6 +26,7 @@ function ProductCard({ product }) {
         {product.price.toLocaleString()} ₫
       </p>
       
+      {/* Gọi hàm kiểm tra thay vì gọi trực tiếp addToCart */}
       <button 
         onClick={handleAddToCart}
         style={{ 
