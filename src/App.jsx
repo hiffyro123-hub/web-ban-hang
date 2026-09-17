@@ -10,7 +10,7 @@ import './App.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Vệ sĩ kiểm tra F5
+// Vệ sĩ kiểm tra F5: CỨ F5 LÀ VỀ TRANG CHỦ
 function RedirectOnRefresh() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,9 +19,8 @@ function RedirectOnRefresh() {
     const navEntries = performance.getEntriesByType('navigation');
     const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
 
-    // ĐÃ SỬA Ở ĐÂY: Thêm "&& location.pathname !== '/auth'"
-    // Nghĩa là: Nếu F5 ở trang khác "/" (Trang chủ) VÀ khác "/auth" (Đăng nhập) thì mới văng về Trang chủ
-    if (isReload && location.pathname !== '/' && location.pathname !== '/auth') {
+    // ĐÃ SỬA LẠI: Bỏ ngoại lệ /auth đi. Giờ chỉ cần đường dẫn khác '/' là sẽ bị đẩy về '/'
+    if (isReload && location.pathname !== '/') {
       navigate('/', { replace: true });
     }
   }, [navigate, location]);
