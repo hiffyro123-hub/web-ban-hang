@@ -1,12 +1,20 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify'; 
 
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
+  // 1. KHI F5 HOẶC MỞ TRANG: Lấy giỏ hàng đã lưu trong bộ nhớ ra (nếu có)
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCart = localStorage.getItem('cartItems');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
-  // Hàm 1: Thêm vào giỏ
+  // 2. MỖI KHI GIỎ HÀNG THAY ĐỔI: Tự động lưu thẳng vào bộ nhớ
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
+
   const addToCart = (product) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -17,17 +25,13 @@ export function CartProvider({ children }) {
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
-    
-    // Thông báo màu xanh thành công
     toast.success(`Đã thêm ${product.name} vào giỏ hàng!`);
   };
 
-  // Hàm 2: Xóa khỏi giỏ
   const removeFromCart = (id) => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-  // Hàm 3: Tăng/giảm số lượng
   const updateQuantity = (id, amount) => {
     setCartItems(cartItems.map(item => {
       if (item.id === id) {
