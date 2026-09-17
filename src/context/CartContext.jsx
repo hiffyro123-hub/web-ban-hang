@@ -4,16 +4,21 @@ import { toast } from 'react-toastify';
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  // 1. KHI F5 HOẶC MỞ TRANG: Lấy giỏ hàng đã lưu trong bộ nhớ ra (nếu có)
+  // 1. Kiểm tra xem người dùng ĐÃ ĐĂNG NHẬP CHƯA
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+  // 2. Lấy giỏ hàng thật từ bộ nhớ ra
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem('cartItems');
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // 2. MỖI KHI GIỎ HÀNG THAY ĐỔI: Tự động lưu thẳng vào bộ nhớ
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  // CHÌA KHÓA Ở ĐÂY: Nếu đăng nhập thì hiện đồ, nếu đăng xuất thì trả về rỗng []
+  const displayCartItems = isLoggedIn ? cartItems : [];
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -43,7 +48,12 @@ export function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider value={{ 
+      cartItems: displayCartItems, // Trả ra giỏ hàng ảo này thay vì giỏ thật
+      addToCart, 
+      removeFromCart, 
+      updateQuantity 
+    }}>
       {children}
     </CartContext.Provider>
   );
